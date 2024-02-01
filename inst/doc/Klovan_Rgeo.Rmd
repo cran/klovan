@@ -1,0 +1,98 @@
+---
+title: "Rgeo_Klovan"
+author: "Jonathan Gordon, Hope Omodolor, Eric Helfer, Jeffrey Yarus, Roger French"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rgeo_Klovan}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+# What is Klovan v0.0.9 and what does it do?
+
+### The "Klovan v0.0.9" package offers a comprehensive set of geostatistical, visual, and analytical methods, in conjunction with the expanded version of the acclaimed J.E. Klovan's mining dataset. This makes the package an excellent learning resource for Principal Component Analysis (PCA), Factor Analysis (FA), kriging, and other geostatistical techniques. Originally published in the 1976 book 'Geological Factor Analysis', the included mining dataset was assembled by Professor J. E. Klovan of the University of Calgary. Being one of the first applications of FA in the geosciences, this dataset has significant historical importance. As a well-regarded and published dataset, it is an excellent resource for demonstrating the capabilities of PCA, FA, kriging, and other geostatistical techniques in geosciences. For those interested in these methods, the 'Klovan'dataset provides a valuable and illustrative resource. Note that some methods in the Klovan Package require the Rgeostats package. Please refer to the README for installation instructions. This package was supported by the MDS3 Center for Materials Data Science for Stockpile Stewardship.
+
+# Here we show how to use the packages features with the use of the suggested Rgeostats package
+### Installation instructions here: http://rgeostats.free.fr/download.php
+
+## Install and load the package
+
+### After downloading the package file “Klovan_0.0.9.tar.gz”, put it in your preferred working directory and run both of the following lines:
+```{r, eval = FALSE}
+# install.packages("Klovan_0.0.9.tar.gz", repos = NULL, type = "source")
+# library(klovan)
+```
+
+### Alternatively in your Rstudio console use this code:
+```{r, eval = FALSE}
+# install.packages("klovan")
+# library(klovan)
+```
+
+### Loading data
+```{r, warning = FALSE, eval = FALSE}
+#library(RGeostats)
+#data("Klovan_Row80", package = "klovan")
+Klovan_Row80 <- load(file = "~/CSE_MSE_RXF131/cradle-members/sdle/jeg165/git/klovan/packages/Klovan0.0.9/data/Klovan_Row80.rda")
+```
+
+#### In the code above, we load the required data from the klovan package.
+
+### Here we create a database from our klovan dataframe to use in our analysis.
+```{r, warning = FALSE, eval = FALSE}
+# Building a database based on RC1 factor
+db <- Rgeo_database(Klovan_Row80, 3, "RC1")
+```
+
+#### Print the created database
+```{r, warning = FALSE, eval = FALSE}
+print(db)
+```
+
+### In this block, we build a database using the Rgeo_database() function and then print it.
+```{r, warning = FALSE, eval = FALSE}
+# Construct and plot the experimental variogram
+Rgeo_vario_construct_plot(db, 3, "RC1", lag = 500)
+```
+
+### Here, we construct and plot the experimental variogram for our data. This plot will help us to determine how to build our variogram model.
+```{r, warning = FALSE, eval = FALSE}
+# Fit the variogram model based on experimental variogram
+model <- Rgeo_vario_model(db, 3, "RC1", lag = 500, model = 13)
+```
+
+#### Print the fitted model parameters
+```{r, warning = FALSE, eval = FALSE}
+print(model)
+```
+
+### Based on our experimental variogram, we fit a variogram model using the Rgeo_vario_model() function. The resulting model parameters are printed for review.
+
+
+
+### Perform kriging based on the variogram model
+```{r, warning = FALSE, eval = FALSE}
+krig <- Rgeo_kriging(db, model)
+```
+
+
+#### Print the kriging results
+```{r, warning = FALSE, eval = FALSE}
+print(krig)
+```
+
+### Next, we perform kriging based on our variogram model. The kriging results are printed.
+
+```{r, warning = FALSE, eval = FALSE, eval = FALSE}
+# Plot the kriging estimation results
+Rgeo_kriging_plot(krig, db, "RC1")
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Krige Plot"}
+knitr::include_graphics("Rgeo_krig.png")
+```
+
+### Finally, we plot the kriging estimation results. This visualization can be used to better understand the spatial distribution of the "RC1" variable.
+
+
+### Remember, this analysis is based on the "RC1" factor. To analyze other factors, run the analysis again from the database building stage, changing the factor as necessary.

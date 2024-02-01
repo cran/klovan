@@ -1,0 +1,66 @@
+# This is the README for the Klovan package
+
+# Klovan Package
+
+## Introduction
+
+### Welcome to the Klovan Package! This package provides a comprehensive set of Geostatistical, visualization, and analytical methods and J.E. Klovan's mining dataset, making it an excellent learning tool for principal component analysis (PCA) and factor analysis (FA), kriging and other geostatistics methods. The package offers a range of functions to apply these techniques to the dataset and learn extract valuable insights.
+
+## Data
+### All functions in this package require the use of a klovan data set. Two are inculded in the package. To convert your own data into a 'klovan' data set the following naming conventions must be used. Data must include coordinate columns beging with "C_" and excludes any rank, ID, or column not for analysis. To see this in more deatil explore the incuded Klovan_Row80 dataset.
+
+## 'Rgeostats'
+### To enhance the functionality and expand the analysis options of the 'klovan' Package, we suggest downloading and installing 'Rgeostats'. 'Rgeostats' is a powerful package for geostatistical analysis in R. It offers additional methods and tools that are used for some methods in the 'klovan' Package. Installation instructions here: http://rgeostats.free.fr/download.php
+
+## Features
+
+### Mining Dataset: The Klovan Package includes J.E. Klovan's well-known mining dataset. This dataset is widely recognized in the field and serves as a valuable resource for understanding for geostatistical learning. It provides an opportunity to explore real-world geological data and gain practical experience with PCA, FA, kriging and other geostatistics methods.
+### Analytical Methods:
+### Principle Component Analysis:
+#### calc_eigenvalues
+#### calc_eigenvectors
+#### eigen_contribution
+### Factor Analysis:
+#### factor_analysis
+### Inverse Distance Weighted:
+#### inv_dis_wt
+### Kriging:
+#### kriging
+### Visualization:
+#### correlation_plot
+#### factor_cor_plot
+#### pc_cor_plot
+#### factor_score_plot
+#### scree_plot
+#### vario_plot
+### Other Methods:
+#### cor_mtrx
+#### covar_mtrx
+#### manage_outliers
+### Rgeostats Required Functions:
+#### Rgeo_database
+#### Rgeo_vario_construct_plot
+#### Rgeo_vario_model
+#### Rgeo_kriging
+#### Rgeo_kriging_plot
+
+## Installation
+### To install the 'klovan' Package, you can use the following steps:
+### Copy code in R studio:
+#### install.packages("klovan")
+
+## Getting Started
+### To get started with the 'Klovan' Package, you can refer to the provided documentation and examples. The package documentation and vignettes outline the available functions and provide guidance on their usage.
+
+## License
+### This work is legally bound by the following software license: The MIT License (MIT) [^1]. Please see the LICENSE.txt file, in the root of this repository, for further details.
+
+[^1]: [https://opensource.org/license/mit/]
+
+## Package team
+### Jonathan Gordon, Eric Helfer, Hope Omodolor, Jeffery Yarus, Roger French
+[Case Western Reserve University, SDLElab] [2]
+
+
+[2]: http://sdle.case.edu
+

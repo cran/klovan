@@ -1,0 +1,208 @@
+---
+title: "Klovan v0.0.9"
+author: "Jonathan Gordon, Hope Omodolor, Eric Helfer, Jeffrey Yarus, Roger French"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{v0.0.9}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# What is Klovan v0.0.9 and what does it do?
+
+### The "Klovan v0.0.9" package offers a comprehensive set of geostatistical, visual, and analytical methods, in conjunction with the expanded version of the acclaimed J.E. Klovan's mining dataset. This makes the package an excellent learning resource for Principal Component Analysis (PCA), Factor Analysis (FA), kriging, and other geostatistical techniques. Originally published in the 1976 book 'Geological Factor Analysis', the included mining dataset was assembled by Professor J. E. Klovan of the University of Calgary. Being one of the first applications of FA in the geosciences, this dataset has significant historical importance. As a well-regarded and published dataset, it is an excellent resource for demonstrating the capabilities of PCA, FA, kriging, and other geostatistical techniques in geosciences. For those interested in these methods, the 'Klovan' dataset provides a valuable and illustrative resource. Note that some methods in the Klovan Package require the Rgeostats package. Please refer to the README for installation instructions. This package was supported by the MDS3 Center for Materials Data Science for Stockpile Stewardship.
+
+# Here we show how to use the packages features without the use of the suggested Rgeostats package
+
+
+## Install and load the package
+
+### After downloading the package file “Klovan_0.0.9.tar.gz”, put it in your preferred working directory and run both of the following lines:
+```{r, eval = FALSE}
+# install.packages("Klovan_0.0.9.tar.gz", repos = NULL, type = "source")
+# library(klovan)
+```
+
+### Alternatively in your Rstudio console use this code:
+```{r include=FALSE}
+# install.packages("klovan")
+# library(klovan)
+library(ggplot2)
+```
+
+### Run code to load data and try transforming it
+```{r warning=FALSE, results='hide'}
+#loading data
+data("Klovan_Row80", package = "klovan")
+data("Klovan_2D_all_outlier", package = "klovan")
+
+#apply a range transform to your data 
+T_klovan <- klovan::range_transform(Klovan_Row80)
+```
+
+### The data we are using is the Klovan mining data set. Which is one of the first applications of FA in the geosciences. Here we know the position of an ore body and we will use geostatistical techniques to find another one without having to start digging. 
+
+## Principal Component Analysis (PCA)
+### Principal Component Analysis or *PCA* is generally used for “data reduction” in order to simplify data sets and to avoid unstable models due to *Collinearity*.  Collinearity occurs when two variables share similar information – one variable can be predicted by the other. This may result in overfitting models. PCA is an unsupervised method and creates a new set of uncorrelated variables containing the same information as the original data set. The new set of variables, called principal components, are ordered, and thus summarize decreasing proportions of the total original variation. Therefore the first few PC’s generally contain most of the total variance.  PCA begins with an eigendecomposition of a correlation matrix or a variance-covariance matrix. It produces a number of properties that could give insight into your data.  Some of the key properties are: 
+  
+    - Eigenvectors:   also called Principal Components
+    - Eigenvalues:    the factor by which the eigenvector is scaled
+
+### Here we can use a covariance matrix, but we must normalize the data first. This is critical because the scales of each variable can be very different and  can influence weighting. Thus, a variable with large numbers can have disproportionate influence compared with variables with small numbers. 
+
+### First, the Covariance Matrix is calculated (more precisely, the **variance co-variance matrix**.  Recall that the diagonal is the variance.  The variance = Sum ((Xi-Mean)^2)/n.  The co-variance = Sum ((Xi - Yi)^2)/N. 
+
+### Here we will build a co-variance matrix and use PCA to find Eigenvectors and Eigenvalues
+```{r, warning = FALSE}
+#build a correlation matrix 
+cov_mtrx <- klovan::covar_mtrx(T_klovan)
+cov_mtrx
+
+#calulate Eiegn values
+klovan::calc_eigenvalues(cov_mtrx)
+
+#calulate Eiegn vectors
+klovan::calc_eigenvectors(cov_mtrx)
+```
+
+### Not very exciting yet!  It gets better...
+
+### In the next step we calculate the sum of all the eigenvalues.  This is in preparation to calculate the eigenvalue contribution.  Each Eigenvalue will be divided by the sum of the eigenvalues in order to determine the proportional contribution.
+
+### The proportion of total variance explained by the eigenvalues from the Covariance Matrix. This yields the percent contribution of each eigenvalue.
+```{r, warning = FALSE}
+eigen_data <- klovan::eigen_contribution(T_klovan)
+eigen_data
+```
+
+### We can also visualize the proportional contribution using a scree plot.
+```{r, warning = FALSE, eval = FALSE}
+klovan::scree_plot(eigen_data)
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Scree Plot"}
+knitr::include_graphics("scree_plot.png")
+```
+
+### Here we can also customize how our plot looks.
+```{r, warning = FALSE, eval = FALSE}
+klovan::scree_plot(eigen_data, bar_fill = "green", outline = "darkgreen", eigen_line = "lightblue")
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Scree Plot"}
+knitr::include_graphics("scree_plot_color.png")
+```
+
+### Alternatively we can use a correlation matrix, thus we do not have to normalize our data first. We can run all the analysis with the matrix aswell.
+```{r, warning = FALSE}
+#make a correlation plot 
+klovan::cor_mtrx(Klovan_Row80)
+```
+
+### The following code chunk produces a correlation plot called a correlation "circle," or a "circle" plot. The concept is to plot the loadings from one PC against another. Recall that we already understand that the first 3 PC's account for 99% of the variance in the data set. So, we need only investigate these PC's. The correlation plot is a 2D plot, so you can only compare 2 PC's at a time. In the code chunk below, we compare PC1 against PC2. 
+```{r, warning = FALSE}
+klovan::pc_cor_plot(Klovan_Row80, "PC1", "PC2")
+#see function decimation for more information on how to interpret this plot
+```
+
+## Factor Analysis (FA)
+### The primary use of Factor Analysis (FA) is to better interpret the meaning behind the various PC's. While PCA and FA are similar, there are some fundamental differences, particularly in the objectives. In brief, PCA focuses on data reduction in a way that the variance from a particular data set may be explained by a set of fewer new variables we call PC's. In FA, the premise is a bit different. In FA, the goal is to uncover a "phantom" variable(s) that could not be directly measured.
+
+### Run the next code chunk which will perform factor analysis with "Varimax" orthogonal rotation. Additionally, the factor scores will be calculated.  
+```{r, warning = FALSE}
+#factor analysis 
+klovan::factor_analysis(Klovan_Row80)
+```
+
+### Run the next code chunk. The component axes are renamed to reflect that they are now factors and rotated.  The R stands for "rotated," and the L stands for "loadings" 
+### *Note:* How is this correlation plot different from the previous one made with principle components? 
+```{r, warning = FALSE}
+#make correlation plot using factor data
+klovan::factor_cor_plot(klovan::factor_analysis(Klovan_Row80), "FAC1", "FAC2")
+#customize color choices 
+klovan::factor_cor_plot(Klovan_Row80, "FAC1", "FAC3", text_col = "pink", line_col = "red")
+```
+
+## Inverse Distance Weighting (IDW)
+### The following chunk of code uses the interpolation algorithm, Inverse Distance Weighting (IDW). We will plot the mapped solution for each rotated factor score. Recall from above we have the position of a known ore body. Here it is circled in white.
+```{r, warning = FALSE}
+#use inverse distance weighted method for interpolation
+inv_dis_data <- klovan::inv_dis_wt(Klovan_Row80, 3)
+summary(inv_dis_data) #view data summary
+```
+
+```{r, warning = FALSE, eval = FALSE}
+klovan::factor_score_plot(a, FALSE, data = Klovan_Row80) + ggforce::geom_ellipse(
+    aes(x0 = 3900, y0 = 1700, a = 600, b = 400, angle = pi/2.5),
+    color = "white")
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Inverse Distance Weighting Plot"}
+knitr::include_graphics("invs_dis3.png")
+```
+
+### Recall that each factor score represents the elements of a "phantom" variable. From factor analysis, it is determined that the phantom variable RC1 represented "Paleo-Temperature" due to the high loadings of Mg, Fe, Na, and Sulfide.  RC2, represented "Deformation Intensity" due to high loading of Cleavage Spacing, Elongation, and Fold. V RC3 represented "Porosity/Permeability" due to high loadings of Veins and Fractures. Producing a contoured map of each of these phantom variables can help define their relationship to the known ore body. The facet image below shows the isolines from each of these variables separately along with the position of the known iron ore body. The isolines for each RC variable define the limits or extents of the ore body.Finding the intersection of these three isoline sets can help located any new potential ore body. 
+
+### The plot shows us the cutoffs should be approximately:
+#### RC1 =  0.0 and 0.5
+#### RC2 = -1.0 and 0.0
+#### RC3 = -0.5 and 1.0 
+  
+
+### The objective now is to determine where all 3 cutoffs from the rotated component scores overlap.  
+### In the following code chunk the contours are overlain.The intent of this overlaying set of isolines is to assist you in finding a second ore body based on the PCA/FA analysis. Run this code to highlight the new body where the component scores overlap.
+```{r, warning = FALSE, eval = FALSE}
+klovan::factor_score_plot(inv_dis_data, TRUE, data = Klovan_Row80) + ggforce::geom_ellipse(
+    aes(x0 = 3900, y0 = 1700, a = 600, b = 400, angle = pi/2.5),
+    color = "white") +
+  ggforce::geom_circle(
+    aes(x = NULL, y = NULL, x0 = 3300, y0 = 3500, r = 400),
+  color = "white", 
+  inherit.aes = FALSE)
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Inverse Distance Weighting Plot"}
+knitr::include_graphics("invs_dis.png")
+```
+
+### Unfortunately those plot look fairly bad especially around our data points. Next we will use a better method.
+
+
+## Kriging
+### Kriging has several advantages over Inverse Distance Weighting (IDW) making it a preferable interpolation method. It effectively models spatial autocorrelation, accounting for both distance and spatial arrangement. Kriging provides the best linear unbiased prediction, thus minimizing estimation variance, and offers an estimate of prediction error, allowing for the assessment of prediction quality. Although computationally intensive and requiring model fitting, its flexibility in adapting to different spatial patterns makes it superior to IDW.
+
+### First we must make a good looking variogram model.
+```{r, warning = FALSE}
+#plot variogram for use in kriging
+klovan::vario_plot(Klovan_Row80, factor = 1, nugget = .214, nlags = 10, sill = 7.64507, range_val = 6271.83, model_name = "Gau1")
+```
+
+### We can use these results as parameters for the klovan::kriging function. We can also use the klovan::kriging.auto function to automatically find the best variogram.
+
+### Here we will apply the kriging and see a summary of the data
+```{r, warning = FALSE, eval = FALSE}
+#use kriging method for interpolation and 
+#plot with factors overlapped and separated
+krig_data <- klovan::kriging.auto(Klovan_Row80, 3) #customize available for nugget, psill, range, and model see function documentation for more details
+summary(krig_data) #view data summary
+```
+
+### Now we can see our old and new ore bodies where the component scores overlap
+```{r, warning = FALSE, eval = FALSE}
+klovan::factor_score_plot(krig_data, TRUE, data = Klovan_Row80) + ggforce::geom_ellipse(
+    aes(x0 = 3900, y0 = 1700, a = 600, b = 400, angle = pi/2.5),
+    color = "white") +
+  ggforce::geom_circle(
+    aes(x = NULL, y = NULL, x0 = 3300, y0 = 3500, r = 400),
+  color = "white", 
+  inherit.aes = FALSE)
+```
+
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Krige Plot"}
+knitr::include_graphics("krig_fin1.png")
+```
+
+## Conclusion
+### The Klovan v0.0.9 package is a robust tool for performing Principal Component Analysis (PCA) and Factor Analysis (FA) using R. These techniques enable users to simplify complex datasets and uncover underlying patterns. The utility of Klovan was demonstrated through a detailed analysis of a geological dataset, identifying valuable insights into potential ore body locations.
+

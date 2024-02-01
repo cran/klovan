@@ -1,0 +1,46 @@
+---
+title: "Klovan_Data"
+author: "Jonathan Gordon, Hope Omodolor, Eric Helfer, Jeffrey Yarus, Roger French"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Klovan_Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Data Description
+---------------------------
+The dataset consists of exploration data for lead and zinc in an area containing high-grade lead-zinc ore. The region has undergone extensive geological investigation, revealing a bedrock composed of an altered carbonate-shale sequence. For the convenience of sorting and quick indentifying, the variables have prefixes attached to them: "C_" used to identify a coordinate (e.g. x coordinate, y coordinate), "P_" used to identify a numeric value such as a property or variable measurement.
+
+80 observations of 13 variables are included:
+
+* __rank:__ rank of the observation
+* __C_X:__ X-coordinate of the observation
+* __C_Y:__ Y-coordinate of the observation
+* __P_Elong:__ elongation of the geological feature
+* __P_Fe:__ iron content in the geological feature
+* __P_Fold:__ folding factor of the geological feature
+* __P_Fract:__ fracturing level of the geological feature
+* __P_Mg:__ magnesium content in the geological feature
+* __P_Na:__ sodium content in the geological feature
+* __P_Space:__ spatial arrangement factor of the geological feature
+* __P_Sulfide:__ sulfide content in the geological feature
+* __P_Veins:__ veining factor of the geological feature
+* __P_XLSize:__ size of the geological feature
+
+Load data
+---------------------------
+
+```{r,  message=FALSE, eval=FALSE}
+# Load the Klovan data set
+data(Klovan_Row80)
+?Klovan_Row80
+```
+
+Correlation plot
+---------------------------
+```{r, out.width="675px", dpi=1000, echo=FALSE, fig.cap="Correlation plot"}
+knitr::include_graphics("corr.png")
+```
+
